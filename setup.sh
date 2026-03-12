@@ -77,6 +77,20 @@ echo ">>> Cloning ML libraries..."
 [ ! -d pulp-nn ]    && git clone https://github.com/pulp-platform/pulp-nn
 [ ! -d pulp-train ] && git clone https://github.com/pulp-platform/pulp-train
 
+# ─── 6. RedMulE & Golden Model ───────────────────────────────────────────────
+REDMULE_README="hwpe/examples/redmule/RedMulE_README.md"
+if [ ! -f "$REDMULE_README" ]; then
+  echo ">>> Downloading RedMulE README for reference..."
+  curl -fsSL https://raw.githubusercontent.com/pulp-platform/redmule/main/README.md \
+    -o "$REDMULE_README"
+fi
+
+GOLDEN_DIR="hwpe/examples/redmule/gemm/inc/test_header_generation/redmule-golden-model"
+if [ ! -d "$GOLDEN_DIR" ]; then
+  echo ">>> Cloning RedMulE golden model..."
+  git clone https://github.com/yvantor/redmule-golden-model.git "$GOLDEN_DIR"
+fi
+
 # ─── Done ────────────────────────────────────────────────────────────────────
 echo ""
 echo "============================================="

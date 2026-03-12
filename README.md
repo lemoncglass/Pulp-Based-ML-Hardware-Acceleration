@@ -29,6 +29,7 @@ That's it. `setup.sh` handles all cloning, patching, and building automatically.
 4. Clones and builds the [PULP SDK](https://github.com/pulp-platform/pulp-sdk)
 5. Clones and builds the [GVSoC](https://github.com/gvsoc/gvsoc) virtual platform simulator
 6. Clones [PULP-NN](https://github.com/pulp-platform/pulp-nn) and [PULP-Train](https://github.com/pulp-platform/pulp-train)
+7. Downloads the [RedMulE](https://github.com/pulp-platform/redmule) README and clones the [golden model](https://github.com/yvantor/redmule-golden-model) into `hwpe/examples/`
 
 > **Note:** All third-party repos are `.gitignored` — they are cloned fresh by `setup.sh`.
 > Only our own code (`hwpe/`), scripts, and patches are committed.

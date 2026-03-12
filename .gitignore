@@ -5,6 +5,7 @@ pulp-riscv-gnu-toolchain/
 pulp-sdk/
 gvsoc/
 pulp-train/
+pulp-nn/
 
 # =============================================================================
 # Toolchain install directory

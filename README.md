@@ -31,7 +31,7 @@ That's it. `setup.sh` handles all cloning, patching, and building automatically.
 6. Clones [PULP-NN](https://github.com/pulp-platform/pulp-nn) and [PULP-Train](https://github.com/pulp-platform/pulp-train)
 
 > **Note:** All third-party repos are `.gitignored` — they are cloned fresh by `setup.sh`.
-> Only our own code, scripts, patches, and the NN kernels are committed.
+> Only our own code (`hwpe/`), scripts, and patches are committed.
 
 ## Toolchain Patches
 
@@ -97,22 +97,21 @@ Stages (in order): `binutils-newlib` → `gcc-newlib-stage1` → `newlib` → `g
 ├── patches/              # Fixes for upstream PULP toolchain bugs
 │   ├── sysroff.info
 │   └── newlib-sys-config.h
-├── pulp-nn/              # Optimized NN kernels (committed — our focus)
-│   ├── 32bit/
-│   └── 64bit/
+├── hwpe/                 # Your custom HWPE accelerator designs go here
 │
 │  ── .gitignored (cloned by setup.sh) ──────────────────────────
 ├── pulp-riscv-gnu-toolchain/   # RISC-V cross-compiler → ~/riscv/
 ├── pulp-sdk/                   # SDK, RTOS, tests
 ├── gvsoc/                      # GVSoC virtual platform simulator
+├── pulp-nn/                    # Optimized NN kernels for reference
 └── pulp-train/                 # Training tools
 ```
 
 ## Next Steps
 
 - **Learn the basics:** Start with examples in `pulp-sdk/tests/`
-- **ML on PULP:** PULP-NN provides quantized kernels for convolutions, pooling, and linear layers
-- **Create a project:** Copy `pulp-sdk/tests/hello/` as a template, then add PULP-NN kernels
+- **Design an HWPE:** Add your accelerator under `hwpe/` — see `hwpe/README.md` for the template
+- **Reference kernels:** `pulp-nn/` has optimized software NN kernels to study or compare against
 
 ## Resources
 

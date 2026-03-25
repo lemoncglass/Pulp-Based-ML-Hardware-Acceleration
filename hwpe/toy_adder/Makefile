@@ -1,16 +1,9 @@
 APP = toy_adder
 APP_SRCS += toy_adder.c
-
-ifdef USE_CLUSTER
-APP_CFLAGS += -DCLUSTER -DNUM_CLUSTER=$(USE_CLUSTER)
-ifdef NUM_CORES
-APP_CFLAGS += -DNUM_CORES=$(NUM_CORES)
-else
-APP_CFLAGS += -DNUM_CORES=1
-endif
-endif
-
-APP_CFLAGS += -Os -g
+APP_CFLAGS += -O3 -g -Iinc
 APP_LDFLAGS += -Os -g
+
+# override for leveraging the custom_hwpe added to gvsoc in this repo.
+override runner_args += --target-property=chip/cluster/custom_hwpe=$(realpath model/toy_adder.py)
 
 include $(RULES_DIR)/pmsis_rules.mk

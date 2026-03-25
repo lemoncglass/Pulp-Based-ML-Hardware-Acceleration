@@ -3158,6 +3158,27 @@
               "out"
             ]
           },
+          "custom_hwpe_ico": {
+            "mappings": {
+              "l1": {
+                "base": "0x10000000",
+                "size": "0x00010000",
+                "remove_offset": "0x10000000",
+                "add_offset": 0,
+                "latency": 0
+              }
+            },
+            "latency": 0,
+            "bandwidth": 0,
+            "shared_rw_bandwidth": false,
+            "max_input_pending_size": 0,
+            "nb_input_port": 1,
+            "vp_component": "gen_interco_router_router_common_cpp_59666758",
+            "ports": [
+              "input",
+              "l1"
+            ]
+          },
           "bindings": [
             [
               "self->data_pe_0",
@@ -3628,6 +3649,14 @@
               "interleaver->in_13"
             ],
             [
+              "self->custom_hwpe_in",
+              "custom_hwpe_ico->input"
+            ],
+            [
+              "custom_hwpe_ico->l1",
+              "interleaver->in_13"
+            ],
+            [
               "self->dma_in_0",
               "interleaver->in_9"
             ],
@@ -3688,7 +3717,8 @@
             "pe8_ico",
             "interleaver",
             "ext2loc",
-            "ext2loc_ts"
+            "ext2loc_ts",
+            "custom_hwpe_ico"
           ],
           "ports": [
             "data_pe_0",
@@ -3721,6 +3751,7 @@
             "event_unit_8",
             "ne16_in",
             "redmule_in",
+            "custom_hwpe_in",
             "dma_in_0",
             "dma_in_1",
             "dma_in_2",
@@ -4644,7 +4675,16 @@
             "in_event_10_pe_7",
             "in_event_11_pe_7",
             "in_event_10_pe_8",
-            "in_event_11_pe_8"
+            "in_event_11_pe_8",
+            "in_event_12_pe_0",
+            "in_event_12_pe_1",
+            "in_event_12_pe_2",
+            "in_event_12_pe_3",
+            "in_event_12_pe_4",
+            "in_event_12_pe_5",
+            "in_event_12_pe_6",
+            "in_event_12_pe_7",
+            "in_event_12_pe_8"
           ]
         },
         "cluster_ico": {
@@ -4757,6 +4797,13 @@
               "remove_offset": "0x10201800",
               "add_offset": 0,
               "latency": 0
+            },
+            "custom_hwpe": {
+              "base": "0x10201000",
+              "size": "0x00000400",
+              "remove_offset": "0x10201000",
+              "add_offset": 0,
+              "latency": 0
             }
           },
           "latency": 0,
@@ -4772,7 +4819,8 @@
             "cluster_ctrl",
             "icache_ctrl",
             "timer",
-            "dma"
+            "dma",
+            "custom_hwpe"
           ]
         },
         "demux_periph_ico": {
@@ -4882,6 +4930,14 @@
             "fetchen_8",
             "halt_8",
             "core_halt_8"
+          ]
+        },
+        "custom_hwpe": {
+          "vp_component": "gen__home_cody_workspace_Pulp-Based-ML-Hardware-Acceleration_hwpe_toy_adder_model_toy_adder_cpp_180753031",
+          "ports": [
+            "input",
+            "irq",
+            "out"
           ]
         },
         "icache_ctrl": {
@@ -5528,6 +5584,10 @@
             "dma->in_9"
           ],
           [
+            "periph_ico->custom_hwpe",
+            "custom_hwpe->input"
+          ],
+          [
             "dma->ext_irq_itf",
             "self->dma_irq"
           ],
@@ -5880,6 +5940,46 @@
             "cluster_ctrl->core_halt_8"
           ],
           [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_0"
+          ],
+          [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_1"
+          ],
+          [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_2"
+          ],
+          [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_3"
+          ],
+          [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_4"
+          ],
+          [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_5"
+          ],
+          [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_6"
+          ],
+          [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_7"
+          ],
+          [
+            "custom_hwpe->irq",
+            "event_unit->in_event_12_pe_8"
+          ],
+          [
+            "custom_hwpe->out",
+            "l1->custom_hwpe_in"
+          ],
+          [
             "icache_ctrl->enable",
             "icache->enable"
           ],
@@ -5951,6 +6051,7 @@
           "dma",
           "timer",
           "cluster_ctrl",
+          "custom_hwpe",
           "icache_ctrl"
         ],
         "ports": [

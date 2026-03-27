@@ -127,17 +127,24 @@ void cluster_entry(void *arg)
      * receives IRQ #12 (LEMON_DOT_EVT0), which the HWPE asserts
      * after writing the last element of C.
      * ------------------------------------------------------------------ */
+    pi_perf_conf(1 << PI_PERF_CYCLES); 
+    pi_perf_reset(); // configure^ & reset latency counter
+
     printf("[lemon_dot] Triggering HWPE...\n");
-    hwpe_trigger_job();
+    pi_perf_start(); // start counter
+
+    hwpe_trigger_job(); // trigger hwpe
     eu_evt_maskWaitAndClr(1 << LEMON_DOT_EVT0);
+    
+    pi_perf_stop(); // stop counter
     printf("[lemon_dot] HWPE finished!\n\n");
 
     /* -- Show result -- */
     print_matrix("C (computed)", matrix_c, DOT_M, DOT_N);
     print_matrix("C (golden)",   golden,   DOT_M, DOT_N);
-
-    /* ------------------------------------------------------------------
-     * Verify each element against the golden reference.
+    
+    /* ------------------------------------------------------------------ *
+     * Verify each element against the golden reference.                  *
      * ------------------------------------------------------------------ */
     int errors = 0;
     for (int i = 0; i < DOT_M * DOT_N; i++) {
@@ -152,12 +159,21 @@ void cluster_entry(void *arg)
     if (errors == 0) {
         printf("<<<<<<<<<<>>>>>>>>>>\n");
         printf("[lemon_dot] PASS — all %d elements match!\n", DOT_M * DOT_N);
-        printf("\n<<<<<<<<<<>>>>>>>>>>\n");
+        
     } else {
-        printf("/!\\ ---------- /!\\\n");
+        printf("/!\\ -----<>----- /!\\\n");
         printf("[lemon_dot] FAIL — %d / %d mismatches\n", errors, DOT_M * DOT_N);
-        printf("\n/!\\ ---------- /!\\\n");
     }
+    // show cycle count
+    printf("\nSimulated cycles: %d\n", pi_perf_read(PI_PERF_CYCLES));
+    
+    // get and show predicted cycle count
+    int predicted_cycles = DOT_M*DOT_K + DOT_K*DOT_N + DOT_M*DOT_N*DOT_K + DOT_M*DOT_N;
+    printf("Predicted cycles: %d\n", predicted_cycles); 
+    
+    // compare actual vs predicted cycles
+    printf("Difference: %d\n\n", pi_perf_read(PI_PERF_CYCLES) - predicted_cycles);
+    printf("<<<<<<<<<<>>>>>>>>>>\n");
 }
 
 /* -------------------------------------------------------------------

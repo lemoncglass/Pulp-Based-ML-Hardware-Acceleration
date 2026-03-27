@@ -137,7 +137,8 @@ private:
         STORE_C     /* writing buf_c back to L1       */
     } state;
 
-    uint32_t idx;    /* element counter within the current phase */
+    uint32_t idx;    /* index within the current phase */
+    uint32_t k_idx;  /* index within the element computation */
     uint32_t cycle_count;  /* total cycles since TRIGGER — for tracing */
 };
 
@@ -163,15 +164,16 @@ LemonDot::LemonDot(vp::ComponentConf &config) : vp::Component(config)
 void LemonDot::reset(bool active)
 {
     if (active) {
-        this->state   = IDLE;
-        this->idx     = 0;
-        this->cycle_count = 0;
-        this->reg_a_ptr = 0;
-        this->reg_b_ptr = 0;
-        this->reg_c_ptr = 0;
-        this->reg_m = 0;
-        this->reg_k = 0;
-        this->reg_n = 0;
+        this->state = IDLE;
+        this->idx           = 0;
+        this->k_idx         = 0;
+        this->cycle_count   = 0;
+        this->reg_a_ptr     = 0;
+        this->reg_b_ptr     = 0;
+        this->reg_c_ptr     = 0;
+        this->reg_m     = 0;
+        this->reg_k     = 0;
+        this->reg_n     = 0;
         memset(this->buf_a, 0, sizeof(this->buf_a));
         memset(this->buf_b, 0, sizeof(this->buf_b));
         memset(this->buf_c, 0, sizeof(this->buf_c));
@@ -267,7 +269,8 @@ vp::IoReqStatus LemonDot::hwpe_slave(vp::Block *__this, vp::IoReq *req)
                         _this->reg_k, _this->reg_n, _this->reg_b_ptr,
                         _this->reg_m, _this->reg_n, _this->reg_c_ptr);
                     _this->state = LOAD_A;
-                    _this->idx   = 0;
+                    _this->k_idx = 0;       // this is here defensively (k_idx will always be 0 at the end of a normal job)
+                    _this->idx   = 0;       // ^                        (idx will be 0 on reset, setting it here in case software tries to start another job mid-job)
                     _this->cycle_count = 0;
                     memset(_this->buf_c, 0, sizeof(_this->buf_c));
                     /* Schedule the FSM to start on the next clock cycle */
@@ -325,6 +328,7 @@ void LemonDot::fsm_handler(vp::Block *__this, vp::ClockEvent *event)
     LemonDot *_this = (LemonDot *)__this;
     _this->cycle_count++;
 
+    // Renaming for readability
     uint32_t M = _this->reg_m;
     uint32_t K = _this->reg_k;
     uint32_t N = _this->reg_n;
@@ -403,18 +407,20 @@ void LemonDot::fsm_handler(vp::Block *__this, vp::ClockEvent *event)
         uint32_t i = _this->idx / N;   /* output row */
         uint32_t j = _this->idx % N;   /* output col */
 
-        int32_t acc = 0;
-        for (uint32_t k = 0; k < K; k++) {
-            int32_t a_val = _this->buf_a[i * K + k];
-            int32_t b_val = _this->buf_b[k * N + j];
-            acc += a_val * b_val;
-        }
-        _this->buf_c[_this->idx] = acc;
+        int32_t a_val = _this->buf_a[i * K + _this->k_idx];
+        int32_t b_val = _this->buf_b[_this->k_idx * N + j];
+    
+        _this->buf_c[_this->idx] += a_val * b_val;  /* accumulate into C[i][j] */
 
         _this->trace.msg("[cyc %3d] COMPUTE C[%d][%d] = %d  (dot product of row %d · col %d)\n",
-                         _this->cycle_count, i, j, acc, i, j);
+                         _this->cycle_count, i, j, _this->buf_c[_this->idx], i, j);
 
-        _this->idx++;
+        _this->k_idx++;
+        if (_this->k_idx >= K) { // once we've done the full dot product for this element, move to the next
+            _this->k_idx = 0;
+            _this->idx++;
+        }
+
         if (_this->idx >= M * N) { // once compute is finished, begin moving C from the buffer to L1 TCDM (memory)
             _this->trace.msg("[cyc %3d] COMPUTE complete (%d elements)\n",
                              _this->cycle_count, M * N);

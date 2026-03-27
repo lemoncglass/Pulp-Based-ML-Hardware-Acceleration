@@ -6,7 +6,7 @@
 # Author: Cody Glassbrenner <glassbrennercody@gmail.com> (heavily assisted by Claude Opus 4.6 agent) 
 #
 # This tells GVSoC:
-#   1. Where the C++ source lives    (add_sources)
+#   1. Where the C++ source lives     (add_sources)
 #   2. What ports the model exposes   (i_INPUT, o_OUT, o_IRQ)
 #
 # The cluster.py target config imports this class, instantiates it,

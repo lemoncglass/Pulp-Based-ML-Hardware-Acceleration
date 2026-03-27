@@ -123,7 +123,9 @@ class L1_subsystem(st.Component):
             self.bind(interleaver, 'out_%d' % i, l1_banks[i], 'input')
 
         self.bind(self, 'ne16_in', interleaver, 'in_%d' % (nb_pe + 4))
-        self.bind(self, 'redmule_in', interleaver, 'in_%d' % (nb_pe + 4)) # TODO: check why it is "nb_pe + 4" and not "nb_pe + 8" -> alternative to NE16!!
+        self.bind(self, 'redmule_in', interleaver, 'in_%d' % (nb_pe + 4)) # it's "nb_pe + 4" here rather than "nb_pe + 8" becuase HWPEs go in port 4. 
+        # Since RedMulE and NE16 are mutually exclusive HWPEs they never exist at the same time, that's why they share the same port.
+        # --> TL;DR: RedMulE is an alternative to NE16.
 
         # Custom HWPE: insert a Router so the L1 base address (0x10000000) is
         # stripped before reaching the interleaver — same as what pe_icos do.

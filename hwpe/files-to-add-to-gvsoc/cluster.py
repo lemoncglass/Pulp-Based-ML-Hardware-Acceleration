@@ -106,7 +106,7 @@ class Cluster(st.Component):
         self.cluster_base   = cluster_conf.get_property('mapping/base', int)
         self.cluster_alias  = cluster_conf.get_property('alias', int)
         ne16_irq            = cluster_conf.get_property('pe/irq').index('acc_0')
-        redmule_irq         = cluster_conf.get_property('pe/irq').index('acc_0') # TODO: why is RedMulE mapped in the same location as NE16?
+        redmule_irq         = cluster_conf.get_property('pe/irq').index('acc_0') # RedMulE is mapped in the same location as NE16 beacause it is an alternative
         dma_irq_0           = cluster_conf.get_property('pe/irq').index('dma_0')
         dma_irq_1           = cluster_conf.get_property('pe/irq').index('dma_1')
         dma_irq_ext         = cluster_conf.get_property('pe/irq').index('dma_ext')

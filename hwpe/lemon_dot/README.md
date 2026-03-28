@@ -57,7 +57,7 @@ Total cycles ≈ M×K + K×N + 2×M×N (for 4×4: 64 cycles)
 
 ### ISA-Level View
 
-There are **no special opcodes** for the HWPE.  Communication is pure MMIO:
+There are **no special opcodes** for this HWPE.  Communication is pure MMIO:
 
 ```asm
 lui   a5, 0x10201        # load HWPE base address
@@ -69,6 +69,8 @@ sw    zero, 0x000(a5)    # TRIGGER the computation
 
 The one PULP ISA extension you'll see is `p.elw` (event load word),
 which puts the core to sleep until the HWPE fires its completion IRQ.
+
+For the special ISA extension version, see lemon_xdot, as it leverages the magia chip similar to light_redmule, allowing rapid configuration through custom opcodes.
 
 ## Reading the Disassembly
 

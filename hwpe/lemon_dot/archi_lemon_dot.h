@@ -24,9 +24,9 @@
  * │  In the disassembly (`make disasm`) you will see patterns like:  │
  * │                                                                  │
  * │    lui   a5, 0x10201        # upper 20 bits of HWPE base addr    │
- * │    sw    a0, 0x040(a5)      # write A_PTR  (0x10201000+0x40)     │ 
- * │    sw    a1, 0x044(a5)      # write B_PTR  (0x10201000+0x44)     │ 
- * │    sw    a2, 0x048(a5)      # write C_PTR  (0x10201000+0x48)     │ 
+ * │    sw    a0, 0x040(a5)      # write A_PTR  (0x10201000+0x40)     │
+ * │    sw    a1, 0x044(a5)      # write B_PTR  (0x10201000+0x44)     │
+ * │    sw    a2, 0x048(a5)      # write C_PTR  (0x10201000+0x48)     │
  * │    li    a0, 4                                                   │
  * │    sw    a0, 0x04c(a5)      # write M_SIZE (0x10201000+0x4C)     │
  * │    sw    a0, 0x050(a5)      # write K_SIZE (0x10201000+0x50)     │

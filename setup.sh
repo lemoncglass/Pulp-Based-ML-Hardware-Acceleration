@@ -61,6 +61,14 @@ run_section() {
   cd "$SCRIPT_DIR"
 }
 
+# ─── PIP compatibility ──────────────────────────────────────────────────────
+# Detect Ubuntu 24.04+ (PEP 668 requires --break-system-packages)
+PIP_EXTRA=""
+if python3 -c "import sysconfig; exit(0 if sysconfig.get_path('stdlib').find('EXTERNALLY-MANAGED') else 1)" 2>/dev/null || \
+   [ -f /usr/lib/python3.*/EXTERNALLY-MANAGED ]; then
+  PIP_EXTRA="--break-system-packages"
+fi
+
 # ─── Section functions ───────────────────────────────────────────────────────
 
 section_system_deps() {
@@ -70,14 +78,8 @@ section_system_deps() {
     build-essential git libftdi-dev libftdi1 doxygen python3-pip \
     libsdl2-dev curl cmake libusb-1.0-0-dev scons gtkterm \
     libsndfile1-dev rsync autoconf automake texinfo libtool \
-    pkg-config libsdl2-ttf-dev
+    pkg-config libsdl2-ttf-dev bison flex
 
-  # Detect Ubuntu 24.04+ (PEP 668 requires --break-system-packages)
-  PIP_EXTRA=""
-  if python3 -c "import sysconfig; exit(0 if sysconfig.get_path('stdlib').find('EXTERNALLY-MANAGED') else 1)" 2>/dev/null || \
-     [ -f /usr/lib/python3.*/EXTERNALLY-MANAGED ]; then
-    PIP_EXTRA="--break-system-packages"
-  fi
   pip3 install --user $PIP_EXTRA argcomplete pyelftools six pyyaml tabulate
 }
 

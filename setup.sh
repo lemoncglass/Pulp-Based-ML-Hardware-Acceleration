@@ -148,6 +148,7 @@ section_gvsoc() {
   fi
 
   cd gvsoc
+  pip3 install --user $PIP_EXTRA -r requirements.txt
   pip3 install --user $PIP_EXTRA -r core/requirements.txt
   pip3 install --user $PIP_EXTRA -r gapy/requirements.txt
   make all TARGETS=pulp-open

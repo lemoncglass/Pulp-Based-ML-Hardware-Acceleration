@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 #
-# install_quick.sh — Fast-path install (Option A)
+# patch_quick.sh — Quickly patches the GVSoC install tree, allowing it to recognize custom HWPEs
 #
 # Scans this folder and copies .py / .json files directly into the GVSoC
 # *install* tree.
 #
 # Changes take effect immediately — no GVSoC rebuild required.
 # Caveat: a future `make clean all` in gvsoc/ will overwrite these files.
-#         Use install_permanent.sh if you need them to survive rebuilds.
+#         Good for quick debugging, use patch_permanent.sh once you know the patches work.
 #
 # NOTE: This script ONLY handles .py and .json files.  If .c / .cpp / .h /
 #       .hpp files are present in this folder they will be SKIPPED with a
-#       warning — use install_permanent.sh for those.
+#       warning — use patch_permanent.sh for those.
 #
 # Optional:  --compile
 #   Searches the caller's current working directory for model/*.cpp and
@@ -47,19 +47,30 @@ fi
 
 # ── 1. Auto-scan and copy .py / .json files ─────────────────────────────
 echo "Scanning $SCRIPT_DIR for .py and .json files..."
-
-copied=0
-# Top-level .py and .json → install generators directory
+file_list=()
 while IFS= read -r -d '' f; do
-    fname="$(basename "$f")"
-    cp "$f" "$INSTALL_DST/"
-    echo "  ✓ $fname → install tree"
-    ((copied++))
+    file_list+=("$f")
 done < <(find "$SCRIPT_DIR" -maxdepth 1 -type f \( -name '*.py' -o -name '*.json' \) -print0)
 
-if (( copied == 0 )); then
-    echo "  (no .py or .json files found)"
-fi
+echo "Found ${#file_list[@]} files:"
+for f in "${file_list[@]}"; do
+    echo " > $(basename "$f")"
+done
+echo ""
+
+#copied=0
+for f in "${file_list[@]}"; do
+    fname="$(basename "$f")"
+    echo "Copying $f to $INSTALL_DST/ ..."
+    if cp "$f" "$INSTALL_DST/"; then
+        echo "  ✓ $fname → install tree"
+        echo ""
+        #((copied++)) # for some reason crashes the script when trying to increment.
+    else
+        echo "  ✗ ERROR copying $f to $INSTALL_DST/ (exit code $?)" >&2
+        exit 2
+    fi
+done
 
 # ── 2. Warn about C/C++ files that this script cannot handle ────────────
 skipped_files=()
@@ -70,7 +81,7 @@ done < <(find "$SCRIPT_DIR" -type f \( -name '*.c' -o -name '*.cpp' -o -name '*.
 if (( ${#skipped_files[@]} > 0 )); then
     echo ""
     echo "⚠  WARNING: The following C/C++ files were SKIPPED (quick install"
-    echo "   cannot handle compiled sources — use install_permanent.sh instead):"
+    echo "   cannot handle compiled sources — use patch_permanent.sh instead):"
     for sf in "${skipped_files[@]}"; do
         echo "     • $sf"
     done
@@ -78,7 +89,7 @@ fi
 
 # ── 3. Compile model .so (only with --compile) ─────────────────────────
 if ! $DO_COMPILE; then
-    echo ""
+    echo "__________________________"
     echo "ℹ  .so compilation skipped (pass --compile to also compile model/*.cpp in \$PWD)."
 fi
 

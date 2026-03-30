@@ -13,8 +13,8 @@
 #   • How the compiler lays out the matrices in memory
 #   • What PULP ISA extensions are actually used
 
-APP = lemon_dot
-APP_SRCS += lemon_dot.c
+APP = lemon_dot_test
+APP_SRCS += lemon_dot_test.c
 APP_CFLAGS += -O2 -g -Iinc
 
 # -O2 gives a good balance: the HWPE register writes are clear in the

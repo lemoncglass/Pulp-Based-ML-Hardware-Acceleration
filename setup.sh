@@ -173,8 +173,8 @@ section_hwpe_patches() {
   # GVSoC install tree.  Without these, any HWPE that uses
   # --target-property=chip/cluster/custom_hwpe=... will fail with
   # "couldn't find component".
-  PATCH_DIR="$SCRIPT_DIR/hwpe/files-to-add-to-gvsoc"
-  if [ ! -f "$PATCH_DIR/install_quick.sh" ]; then
+  PATCH_DIR="$SCRIPT_DIR/hwpe/gvsoc-patches"
+  if [ ! -f "$PATCH_DIR/patch_permanent.sh" ]; then
     echo ">>> HWPE patch directory not found — skipping."
     return 0
   fi
@@ -189,7 +189,7 @@ section_hwpe_patches() {
   fi
 
   echo ">>> Installing HWPE GVSoC patches (cluster.py, l1_subsystem.py, cluster.json)..."
-  bash "$PATCH_DIR/install_quick.sh" || return 1
+  bash "$PATCH_DIR/patch_permanent.sh" || return 1
 }
 
 section_ml_libs() {

@@ -1,5 +1,5 @@
-APP = lemon_adder
-APP_SRCS += lemon_adder.c
+APP = lemon_adder_test
+APP_SRCS += lemon_adder_test.c
 APP_CFLAGS += -O3 -g -Iinc
 APP_LDFLAGS += -Os -g
 

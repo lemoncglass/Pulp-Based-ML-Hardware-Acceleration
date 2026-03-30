@@ -94,7 +94,7 @@ python3 gen_stimuli.py --random --seed 99  # random values
 lemon_dot/
 ├── archi_lemon_dot.h    # Register map (offsets & base address)
 ├── hal_lemon_dot.h      # HAL: inline MMIO helpers
-├── lemon_dot.c          # RISC-V test application
+├── lemon_dot_test.c     # RISC-V test application
 ├── Makefile             # Build + disassembly targets
 ├── gen_stimuli.py       # Test vector generator
 ├── inc/

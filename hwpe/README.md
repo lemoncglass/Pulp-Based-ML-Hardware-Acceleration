@@ -14,17 +14,17 @@ Before any custom HWPE will work, the GVSoC cluster config needs a
 **`custom_hwpe` slot** patched in.  This only has to be done once per machine.
 
 Run one of the install scripts in
-[`files-to-add-to-gvsoc/`](files-to-add-to-gvsoc/):
+[`gvsoc-patches/`](gvsoc-patches/):
 
 ```bash
 # Quick — edits the install tree directly (doesn't survive a GVSoC rebuild):
-./hwpe/files-to-add-to-gvsoc/install_quick.sh
+./hwpe/gvsoc-patches/patch_quick.sh
 
 # Permanent — edits the source tree + re-installs (survives rebuilds):
-./hwpe/files-to-add-to-gvsoc/install_permanent.sh
+./hwpe/gvsoc-patches/patch_permanent.sh
 ```
 
-See the [README inside that folder](files-to-add-to-gvsoc/) for
+See the [README inside that folder](gvsoc-patches/) for
 details on what gets patched and why.
 
 To verify the setup works, build the lemon_adder example:
@@ -53,7 +53,7 @@ Your directory will look like this:
 my_accel/
 ├── archi_lemon_adder.h       → rename to archi_my_accel.h
 ├── hal_lemon_adder.h         → rename to hal_my_accel.h
-├── lemon_adder.c             → rename to my_accel.c
+├── lemon_adder_test.c        → rename to my_accel.c
 ├── Makefile
 ├── inc/
 │   ├── a_input.h           # test input data
@@ -145,7 +145,7 @@ Just `cd` into your HWPE project and pass the flag:
 ```bash
 source setup_env.sh        # from repo root
 cd hwpe/my_accel
-bash ../files-to-add-to-gvsoc/install_quick.sh --compile
+bash ../gvsoc-patches/patch_quick.sh --compile
 make clean all run
 ```
 
@@ -153,7 +153,7 @@ Or with the permanent variant:
 
 ```bash
 cd hwpe/my_accel
-bash ../files-to-add-to-gvsoc/install_permanent.sh --compile
+bash ../gvsoc-patches/patch_permanent.sh --compile
 make clean all run
 ```
 
@@ -179,7 +179,7 @@ cluster behaves identically to stock PULP-open.
 ```
 hwpe/
 ├── README.md                      # (this file)
-├── files-to-add-to-gvsoc/         # Cluster config patches + install scripts
+├── gvsoc-patches/         # Cluster config patches + install scripts
 │   ├── cluster.py                 #   custom_hwpe property + dynamic loading
 │   ├── cluster.json               #   MMIO address mapping (0x10201000)
 │   ├── l1_subsystem.py            #   L1 Router for address stripping

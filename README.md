@@ -71,7 +71,7 @@ Expected output: **"Hello from FC"** from the GVSoC simulator.
 | Problem | Cause | Fix |
 |---------|-------|-----|
 | `riscv32-unknown-elf-gcc: No such file or directory` | Toolchain build failed or incomplete | Check `pulp-riscv-gnu-toolchain/stamps/` — re-run `make newlib` |
-| `couldn't find component: gen__home_..._hwpe_...` | HWPE GVSoC patches not installed | Run `bash hwpe/files-to-add-to-gvsoc/install_quick.sh` or re-run `setup.sh` |
+| `couldn't find component: gen__home_..._hwpe_...` | HWPE GVSoC patches not installed | Run `bash hwpe/gvsoc-patches/patch_quick.sh` or re-run `setup.sh` |
 | `No rule to make target 'sysroff.info'` | Missing patch file | `cp patches/sysroff.info pulp-riscv-gnu-toolchain/riscv-binutils-gdb/binutils/` |
 | `fatal error: sys/config.h` | Missing patch file | `cp patches/newlib-sys-config.h pulp-riscv-gnu-toolchain/riscv-newlib/newlib/libc/include/sys/config.h` |
 | `fatal error: stdint.h` | Newlib build failed silently | Fix `sys/config.h` first, then `cd pulp-riscv-gnu-toolchain && rm -rf build-newlib stamps/build-newlib && make newlib` |

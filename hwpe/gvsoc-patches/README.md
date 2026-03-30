@@ -19,7 +19,7 @@ They replace the **originals** that ship with gvsoc-pulp.
 Both scripts **auto-scan** this folder — you don't have to edit them when you
 add or remove files.  They decide what to do based on file extension:
 
-| Extension          | `install_quick.sh`      | `install_permanent.sh`        |
+| Extension          | `patch_quick.sh`      | `patch_permanent.sh`        |
 |--------------------|-------------------------|-------------------------------|
 | `.py`, `.json`     | ✅ Copied to install tree | ✅ Copied to source tree       |
 | `.c`, `.cpp`, `.h`, `.hpp` | ⚠ **Skipped** (warning printed) | ✅ Copied + incremental rebuild |
@@ -34,7 +34,7 @@ add or remove files.  They decide what to do based on file extension:
   The subdirectory path tells the script where to put them.  For example:
 
   ```
-  files-to-add-to-gvsoc/
+  gvsoc-patches/
     core/models/mymodel/foo.cpp      →  gvsoc/core/models/mymodel/foo.cpp
     pulp/pulp/chips/pulp_open/bar.h  →  gvsoc/pulp/pulp/chips/pulp_open/bar.h
   ```
@@ -67,7 +67,7 @@ Copies `.py` / `.json` straight into the GVSoC **install** tree.
 Instant, but gets overwritten if you later run `make clean all` in `gvsoc/`.
 
 ```bash
-bash hwpe/files-to-add-to-gvsoc/install_quick.sh
+bash hwpe/gvsoc-patches/patch_quick.sh
 ```
 
 ### Option B — Permanent (survives gvsoc/ rebuild)
@@ -76,7 +76,7 @@ Copies into the GVSoC **source** tree, then rebuilds as needed.
 Persists across rebuilds.
 
 ```bash
-bash hwpe/files-to-add-to-gvsoc/install_permanent.sh
+bash hwpe/gvsoc-patches/patch_permanent.sh
 ```
 
 ### `--compile` flag (both scripts)
@@ -86,10 +86,10 @@ Add `--compile` to also compile the C++ model in the **current directory's**
 
 ```bash
 cd hwpe/your_hwpe # replace "your_hwpe" with the desired hwpe directory
-bash ../files-to-add-to-gvsoc/install_quick.sh --compile
+bash ../gvsoc-patches/patch_quick.sh --compile
 
 # or permanently:
-bash ../files-to-add-to-gvsoc/install_permanent.sh --compile
+bash ../gvsoc-patches/patch_permanent.sh --compile
 ```
 
 The script finds every `model/*.cpp` in your `$PWD`, computes the hash-based
@@ -109,7 +109,7 @@ Without `--compile`, no `.so` compilation is done.
 
 1. Create a subdirectory matching the desired path under `gvsoc/`:
    ```
-   mkdir -p hwpe/files-to-add-to-gvsoc/core/models/mymodel
+   mkdir -p hwpe/gvsoc-patches/core/models/mymodel
    ```
 2. Place your `.c` / `.cpp` / `.h` / `.hpp` file in that subdirectory.
 3. Run `install_permanent.sh` — it will copy the file and do an incremental

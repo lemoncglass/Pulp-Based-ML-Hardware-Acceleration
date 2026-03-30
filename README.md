@@ -23,13 +23,15 @@ That's it. `setup.sh` handles all cloning, patching, and building automatically.
 
 ## What `setup.sh` Does
 
-1. Installs system packages (`build-essential`, `cmake`, `texinfo`, etc.)
+1. Installs system packages (`build-essential`, `cmake`, `texinfo`, `bison`, `flex`, `libgmp-dev`, `libmpfr-dev`, `libmpc-dev`, etc.)
 2. Clones the [PULP RISC-V GNU toolchain](https://github.com/pulp-platform/pulp-riscv-gnu-toolchain) and applies two missing-file patches (see below)
-3. Builds the cross-compiler (`riscv32-unknown-elf-gcc`) → installs to `~/riscv/`
-4. Clones and builds the [PULP SDK](https://github.com/pulp-platform/pulp-sdk)
-5. Clones and builds the [GVSoC](https://github.com/gvsoc/gvsoc) virtual platform simulator
-6. Clones [PULP-NN](https://github.com/pulp-platform/pulp-nn) and [PULP-Train](https://github.com/pulp-platform/pulp-train)
-7. Downloads the [RedMulE](https://github.com/pulp-platform/redmule) README and clones the [golden model](https://github.com/yvantor/redmule-golden-model) into `hwpe/examples/`
+3. Downloads GCC prerequisites (GMP, MPFR, MPC) into the GCC source tree via `contrib/download_prerequisites`
+4. Builds the cross-compiler (`riscv32-unknown-elf-gcc`) → installs to `~/riscv/`
+5. Clones and builds the [PULP SDK](https://github.com/pulp-platform/pulp-sdk)
+6. Clones and builds the [GVSoC](https://github.com/gvsoc/gvsoc) virtual platform simulator (installs all Python deps from `requirements.txt`)
+7. Installs HWPE GVSoC patches (`cluster.py`, `l1_subsystem.py`, `cluster.json`) into the GVSoC install tree — required for the `custom_hwpe` slot used by lemon_adder, lemon_dot, etc.
+8. Clones [PULP-NN](https://github.com/pulp-platform/pulp-nn) and [PULP-Train](https://github.com/pulp-platform/pulp-train)
+9. Downloads the [RedMulE](https://github.com/pulp-platform/redmule) README and clones the [golden model](https://github.com/yvantor/redmule-golden-model) into `hwpe/examples/`
 
 > **Note:** All third-party repos are `.gitignored` — they are cloned fresh by `setup.sh`.
 > Only our own code (`hwpe/`), scripts, and patches are committed.
@@ -69,11 +71,15 @@ Expected output: **"Hello from FC"** from the GVSoC simulator.
 | Problem | Cause | Fix |
 |---------|-------|-----|
 | `riscv32-unknown-elf-gcc: No such file or directory` | Toolchain build failed or incomplete | Check `pulp-riscv-gnu-toolchain/stamps/` — re-run `make newlib` |
+| `couldn't find component: gen__home_..._hwpe_...` | HWPE GVSoC patches not installed | Run `bash hwpe/files-to-add-to-gvsoc/install_quick.sh` or re-run `setup.sh` |
 | `No rule to make target 'sysroff.info'` | Missing patch file | `cp patches/sysroff.info pulp-riscv-gnu-toolchain/riscv-binutils-gdb/binutils/` |
 | `fatal error: sys/config.h` | Missing patch file | `cp patches/newlib-sys-config.h pulp-riscv-gnu-toolchain/riscv-newlib/newlib/libc/include/sys/config.h` |
 | `fatal error: stdint.h` | Newlib build failed silently | Fix `sys/config.h` first, then `cd pulp-riscv-gnu-toolchain && rm -rf build-newlib stamps/build-newlib && make newlib` |
 | `~/riscv/bin/` is empty | Binutils failed (likely `sysroff.info`) | Apply patches and rebuild from scratch |
-| `gvsoc: No such file or directory` | GVSoC not built | Re-run `setup.sh` or build manually (see setup.sh step 4) |
+| `gvsoc: No such file or directory` | GVSoC not built | Re-run `setup.sh` or build manually (see setup.sh step 6) |
+| GVSoC build fails with `psutil` missing | Top-level `gvsoc/requirements.txt` not installed | `pip3 install --user psutil` or re-run `setup.sh` |
+| `bison: command not found` / binutils configure fails | `bison` / `flex` not installed | `sudo apt-get install -y bison flex` |
+| `configure: error: Building GCC requires GMP 4.2+, MPFR 2.4.0+ and MPC 0.8.0+` | GCC math prerequisites missing | `cd pulp-riscv-gnu-toolchain/riscv-gcc && ./contrib/download_prerequisites` then rebuild |
 | `externally-managed-environment` (pip) | Ubuntu 24.04+ PEP 668 | `setup.sh` handles this; manually add `--break-system-packages` to pip |
 | `cmake: command not found` | cmake missing | `sudo apt-get install -y cmake` |
 
@@ -107,6 +113,26 @@ Stages (in order): `binutils-newlib` → `gcc-newlib-stage1` → `newlib` → `g
 ├── pulp-nn/                    # Optimized NN kernels for reference
 └── pulp-train/                 # Training tools
 ```
+
+## Building & Running All HWPEs
+
+After setup, you can build and run every HWPE example in one command:
+
+```bash
+source setup_env.sh
+cd hwpe
+make            # builds and runs all HWPEs, prints a pass/fail summary
+```
+
+Or target a single one:
+
+```bash
+make lemon_adder
+make lemon_dot
+make redmule
+```
+
+Use `make list` to see all available HWPEs, and `make clean` to clean all build artifacts.
 
 ## Next Steps
 

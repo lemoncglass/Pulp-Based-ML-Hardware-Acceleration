@@ -138,9 +138,16 @@ include $(RULES_DIR)/pmsis_rules.mk
 
 ## Step 8 — Compile the `.so` and run
 
-Both install scripts accept a `--compile` flag that compiles every
-`model/*.cpp` in your **current directory** into the `.so` that GVSoC expects.
-Just `cd` into your HWPE project and pass the flag:
+To compile your model, use [compile_custom_hwpe.sh](compile_custom_hwpe.sh) found in this directory. This script compiles every `model/*.cpp` in your **current directory** into the `.so` that GVSoC expects. You just have to `cd` into the directory of the model you want to run, then do `bash ../compile_custom_hwpe.sh`. For example, starting from the repo root:
+
+```bash
+source setup_env.sh         # from repo root
+cd hwpe/my_accel
+bash ../compile_custom_hwpe.sh  # from your accelerator's directory
+make clean all run
+```
+
+Additionally, both patch scripts accept a `--compile` flag, allowing them to do the same thing as the compile script. Just `cd` into your HWPE project and pass the flag:
 
 ```bash
 source setup_env.sh        # from repo root
@@ -183,8 +190,8 @@ hwpe/
 │   ├── cluster.py                 #   custom_hwpe property + dynamic loading
 │   ├── cluster.json               #   MMIO address mapping (0x10201000)
 │   ├── l1_subsystem.py            #   L1 Router for address stripping
-│   ├── install_quick.sh           #   Option A installer
-│   ├── install_permanent.sh       #   Option B installer
+│   ├── patch_quick.sh             #   Quick patcher for debugging
+│   ├── patch_permanent.sh         #   Permanent patcher
 │   └── README.md
 ├── lemon_adder/                     # Minimal working HWPE example (A + B)
 │   ├── README.md

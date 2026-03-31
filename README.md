@@ -114,29 +114,9 @@ Stages (in order): `binutils-newlib` → `gcc-newlib-stage1` → `newlib` → `g
 └── pulp-train/                 # Training tools
 ```
 
-## Building & Running All HWPEs
-
-After setup, you can build and run every HWPE example in one command:
-
-```bash
-source setup_env.sh
-cd hwpe
-make            # builds and runs all HWPEs, prints a pass/fail summary
-```
-
-Or target a single one:
-
-```bash
-make lemon_adder
-make lemon_dot
-make redmule
-```
-
-Use `make list` to see all available HWPEs, and `make clean` to clean all build artifacts.
-
 ## Next Steps
 
-- **Learn the basics:** Start with examples in `pulp-sdk/tests/`
+- **Learn the basics:** Start with examples like lemon_adder in `hwpe/` then check out others in `hwpe/examples` and `pulp-sdk/tests/`
 - **Design an HWPE:** Add your accelerator under `hwpe/` — see `hwpe/README.md` for the template
 - **Reference kernels:** `pulp-nn/` has optimized software NN kernels to study or compare against
 

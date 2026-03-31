@@ -1,8 +1,8 @@
 # Files to add to GVSoC
 
 This directory contains the Python/JSON files that wire the **custom HWPE
-slot** into the PULP-open cluster configuration, plus two install scripts
-that **auto-scan** this folder to auto install what they can and warn you about what they can't.
+slot** into the PULP-open cluster configuration, plus two patch scripts
+that **auto-scan** this folder to auto-install what they can and warn you about what they can't.
 
 | File               | What it does |
 |--------------------|--------------|
@@ -42,7 +42,7 @@ add or remove files.  They decide what to do based on file extension:
 **/!\ NOTE:**
 - **Top-level C/C++ files** → **Skipped with a warning** (the script can't guess the destination). Move them into a subdirectory that mirrors the gvsoc path.
 
-### Rebuild strategy (`install_permanent.sh`)
+### Rebuild strategy (`patch_permanent.sh`)
 
 | What changed            | What the script does                         | Speed   |
 |-------------------------|----------------------------------------------|---------|
@@ -112,7 +112,7 @@ Without `--compile`, no `.so` compilation is done.
    mkdir -p hwpe/gvsoc-patches/core/models/mymodel
    ```
 2. Place your `.c` / `.cpp` / `.h` / `.hpp` file in that subdirectory.
-3. Run `install_permanent.sh` — it will copy the file and do an incremental
+3. Run `patch_permanent.sh` — it will copy the file and do an incremental
    `cmake --build`.
 
 > **Note:** If the file is a brand-new source that isn't referenced by any

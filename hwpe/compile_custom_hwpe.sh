@@ -19,6 +19,9 @@ set -euo pipefail
 
 # --- Configuration ---
 # Set these paths if not already set in your environment
+# ── Locate repo root (relative to this script) ──────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../" && pwd)"
 GVSOC_ROOT="$REPO_ROOT/gvsoc"
 MODELS_DIR="$GVSOC_ROOT/install/models"
 

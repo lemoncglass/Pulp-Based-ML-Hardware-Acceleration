@@ -15,7 +15,7 @@ A (42) + B (17) = 59   ✓
 lemon_adder/
 ├── archi_lemon_adder.h       # Register map (base address, control/job offsets)
 ├── hal_lemon_adder.h         # HAL — thin read/write helpers over the register map
-├── lemon_adder.c             # Test program (allocates L1 data, programs HWPE, checks result)
+├── lemon_adder_test.c        # Test program (allocates L1 data, programs HWPE, checks result)
 ├── Makefile                # pulp-sdk build; passes model path via --target-property
 ├── testset.cfg             # GVSoC test-set entry
 ├── inc/
@@ -32,7 +32,7 @@ lemon_adder/
 1. The repo-level environment has been set up (`setup.sh` / `setup_env.sh`).
 2. GVSoC has been built at least once (`cd gvsoc && make clean all`).
 3. The custom-HWPE cluster wiring has been installed — see
-   [`hwpe/files-to-add-to-gvsoc/`](../files-to-add-to-gvsoc/) and run
+   [`hwpe/gvsoc-patches/`](../gvsoc-patches/) and run
    one of its install scripts.
 
 ## Building and running
@@ -65,7 +65,7 @@ Expected output:
 
 ### Software side
 
-1. `lemon_adder.c` allocates three `uint32_t` values in L1 (`pi_l1_malloc`).
+1. `lemon_adder_test.c` allocates three `uint32_t` values in L1 (`pi_l1_malloc`).
 2. It writes `OPERAND_A` and `OPERAND_B` to L1, then programs the HWPE with
    their addresses via the HAL (`hwpe_set_a`, `hwpe_set_b`, `hwpe_set_res_ptr`).
 3. `hwpe_trigger_job()` writes to the TRIGGER register, then the core sleeps on
@@ -86,7 +86,7 @@ Expected output:
 ### Cluster wiring
 
 The Makefile passes `--target-property=chip/cluster/custom_hwpe=<path>` to
-GVSoC.  The modified `cluster.py` in `hwpe/files-to-add-to-gvsoc/` dynamically
+GVSoC.  The modified `cluster.py` in `hwpe/gvsoc-patches/` dynamically
 loads the Python wrapper at that path and wires the HWPE into the cluster:
 
 - **MMIO** — mapped at `0x10201000` through the peripheral interconnect.

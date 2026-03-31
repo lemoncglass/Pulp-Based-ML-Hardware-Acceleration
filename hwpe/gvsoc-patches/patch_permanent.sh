@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# install_permanent.sh — Permanent install (Option B)
+# patch_permanent.sh — Patch the GVSoC source tree to permanently recognize custom HWPEs in this workspace
 #
 # Scans this folder and copies files into the GVSoC *source* tree so they
 # survive rebuilds.

@@ -78,7 +78,8 @@ section_system_deps() {
     build-essential git libftdi-dev libftdi1 doxygen python3-pip \
     libsdl2-dev curl cmake libusb-1.0-0-dev scons gtkterm \
     libsndfile1-dev rsync autoconf automake texinfo libtool \
-    pkg-config libsdl2-ttf-dev bison flex
+    pkg-config libsdl2-ttf-dev bison flex \
+    libgmp-dev libmpfr-dev libmpc-dev
 
   pip3 install --user $PIP_EXTRA argcomplete pyelftools six pyyaml tabulate
 }
@@ -107,8 +108,15 @@ section_toolchain() {
 
   echo ">>> Building toolchain (this is the slow part — ~30-60 min)..."
   cd pulp-riscv-gnu-toolchain
-  ./configure --prefix="$HOME/riscv" --with-arch=rv32imc --with-cmodel=medlow --enable-multilib
-  make newlib
+
+  # GCC needs GMP, MPFR, and MPC. The Makefile's download_prerequisites step is
+  # disabled ("false" == "true"), so we run it manually to bundle them into the
+  # GCC source tree. This is more reliable than depending on system -dev packages.
+  echo ">>> Downloading GCC prerequisites (GMP, MPFR, MPC)..."
+  (cd riscv-gcc && ./contrib/download_prerequisites) || return 1
+
+  ./configure --prefix="$HOME/riscv" --with-arch=rv32imc --with-cmodel=medlow --enable-multilib || return 1
+  make newlib || return 1
   cd "$SCRIPT_DIR"
 
   export PATH="$HOME/riscv/bin:$PATH"
@@ -129,20 +137,25 @@ section_pulp_sdk() {
 
   cd pulp-sdk
   source configs/pulp-open.sh
-  make build
+  make build || return 1
 }
 
 section_gvsoc() {
   if [ ! -d gvsoc ]; then
     echo ">>> Cloning GVSoC simulator..."
     git clone https://github.com/gvsoc/gvsoc.git
-    cd gvsoc
-    git submodule update --init --recursive
-    cd "$SCRIPT_DIR"
   fi
 
+  # Always ensure submodules are initialized (the pulp/ submodule contains
+  # all PULP-specific models like redmule, ne16, cluster, etc.  Without it
+  # the build silently skips them and produces an incomplete install.)
+  echo ">>> Ensuring GVSoC submodules are initialized..."
+  cd gvsoc
+  git submodule update --init --recursive || return 1
+  cd "$SCRIPT_DIR"
+
   # Skip build when install artifacts exist (incremental mode)
-  if [ "$AGGRESSIVE" -eq 0 ] && [ -d gvsoc/install/lib ] && [ -d gvsoc/install/models ]; then
+  if [ "$AGGRESSIVE" -eq 0 ] && [ -d gvsoc/install/lib ] && [ -d gvsoc/install/models/pulp ]; then
     echo ">>> GVSoC already built — skipping (use --aggressive to force rebuild)."
     return 0
   fi
@@ -151,7 +164,32 @@ section_gvsoc() {
   pip3 install --user $PIP_EXTRA -r requirements.txt
   pip3 install --user $PIP_EXTRA -r core/requirements.txt
   pip3 install --user $PIP_EXTRA -r gapy/requirements.txt
-  make all TARGETS=pulp-open
+  make all CONFIG_BUILD_ALL=1 || return 1
+}
+
+section_hwpe_patches() {
+  # The custom HWPE slot (custom_hwpe) requires patched versions of
+  # cluster.py, l1_subsystem.py, and cluster.json to be installed into the
+  # GVSoC install tree.  Without these, any HWPE that uses
+  # --target-property=chip/cluster/custom_hwpe=... will fail with
+  # "couldn't find component".
+  PATCH_DIR="$SCRIPT_DIR/hwpe/gvsoc-patches"
+  if [ ! -f "$PATCH_DIR/patch_permanent.sh" ]; then
+    echo ">>> HWPE patch directory not found — skipping."
+    return 0
+  fi
+
+  # Skip if patches are already installed (incremental mode)
+  INSTALL_DST="$SCRIPT_DIR/gvsoc/install/generators/pulp/chips/pulp_open"
+  if [ "$AGGRESSIVE" -eq 0 ] && \
+     [ -f "$INSTALL_DST/cluster.py" ] && \
+     diff -q "$PATCH_DIR/cluster.py" "$INSTALL_DST/cluster.py" &>/dev/null; then
+    echo ">>> HWPE GVSoC patches already installed — skipping."
+    return 0
+  fi
+
+  echo ">>> Installing HWPE GVSoC patches (cluster.py, l1_subsystem.py, cluster.json)..."
+  bash "$PATCH_DIR/patch_permanent.sh" || return 1
 }
 
 section_ml_libs() {
@@ -216,8 +254,9 @@ run_section "1. System Dependencies"    section_system_deps
 run_section "2. RISC-V Toolchain"       section_toolchain
 run_section "3. PULP SDK"               section_pulp_sdk
 run_section "4. GVSoC Simulator"        section_gvsoc
-run_section "5. ML Libraries"           section_ml_libs
-run_section "6. RedMulE & Golden Model" section_redmule
+run_section "5. HWPE GVSoC Patches"    section_hwpe_patches
+run_section "6. ML Libraries"           section_ml_libs
+run_section "7. RedMulE & Golden Model" section_redmule
 
 # ─── Done ────────────────────────────────────────────────────────────────────
 echo ""

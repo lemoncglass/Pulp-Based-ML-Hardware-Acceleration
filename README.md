@@ -30,8 +30,9 @@ That's it. `setup.sh` handles all cloning, patching, and building automatically.
 5. Clones and builds the [PULP SDK](https://github.com/pulp-platform/pulp-sdk)
 6. Clones and builds the [GVSoC](https://github.com/gvsoc/gvsoc) virtual platform simulator (installs all Python deps from `requirements.txt`)
 7. Installs HWPE GVSoC patches (`cluster.py`, `l1_subsystem.py`, `cluster.json`) into the GVSoC install tree — required for the `custom_hwpe` slot used by lemon_adder, lemon_dot, etc.
-8. Clones [PULP-NN](https://github.com/pulp-platform/pulp-nn) and [PULP-Train](https://github.com/pulp-platform/pulp-train)
-9. Downloads the [RedMulE](https://github.com/pulp-platform/redmule) README and clones the [golden model](https://github.com/yvantor/redmule-golden-model) into `hwpe/examples/`
+8. Builds the **XIF xlemon_adder** target components — compiles custom `.so` files (ISS core with xlemon ISA, XifDecoder, XLemonAdder, ExitModule) so `cd hwpe/xlemon_adder && make sim` works out of the box
+9. Clones [PULP-NN](https://github.com/pulp-platform/pulp-nn) and [PULP-Train](https://github.com/pulp-platform/pulp-train)
+10. Downloads the [RedMulE](https://github.com/pulp-platform/redmule) README and clones the [golden model](https://github.com/yvantor/redmule-golden-model) into `hwpe/examples/`
 
 > **Note:** All third-party repos are `.gitignored` — they are cloned fresh by `setup.sh`.
 > Only our own code (`hwpe/`), scripts, and patches are committed.
@@ -65,6 +66,17 @@ make clean all run
 ```
 
 Expected output: **"Hello from FC"** from the GVSoC simulator.
+
+### XIF Accelerator Test
+
+```bash
+cd hwpe/xlemon_adder
+make sim
+```
+
+Expected output: **"ALL TESTS PASSED"** — this runs a bare-metal test that exercises
+the `xladd` custom RISC-V instruction via the eXtension Interface (XIF).
+See [`hwpe/xlemon_adder/README.md`](hwpe/xlemon_adder/README.md) for details.
 
 ## Troubleshooting
 
@@ -104,7 +116,9 @@ Stages (in order): `binutils-newlib` → `gcc-newlib-stage1` → `newlib` → `g
 ├── patches/              # Fixes for upstream PULP toolchain bugs
 │   ├── sysroff.info
 │   └── newlib-sys-config.h
-├── hwpe/                 # Your custom HWPE accelerator designs go here
+├── hwpe/                 # Custom HWPE accelerator designs
+│   ├── lemon_adder/      #   MMIO-based example (CV32E40P)
+│   ├── xlemon_adder/     #   XIF-based example (CV32E40X) ← start here
 │
 │  ── .gitignored (cloned by setup.sh) ──────────────────────────
 ├── pulp-riscv-gnu-toolchain/   # RISC-V cross-compiler → ~/riscv/
@@ -116,8 +130,8 @@ Stages (in order): `binutils-newlib` → `gcc-newlib-stage1` → `newlib` → `g
 
 ## Next Steps
 
-- **Learn the basics:** Start with examples like lemon_adder in `hwpe/` then check out others in `hwpe/examples` and `pulp-sdk/tests/`
-- **Design an HWPE:** Add your accelerator under `hwpe/` — see `hwpe/README.md` for the template
+- **Learn the basics:** Start with `hwpe/xlemon_adder/` (XIF approach — custom instructions, no MMIO) or `hwpe/lemon_adder/` (MMIO approach). See also `hwpe/examples/` and `pulp-sdk/tests/`
+- **Design an HWPE:** Add your accelerator under `hwpe/` — see `hwpe/README.md` for the MMIO template or `hwpe/xlemon_adder/README.md` for the XIF approach
 - **Reference kernels:** `pulp-nn/` has optimized software NN kernels to study or compare against
 
 ## Resources

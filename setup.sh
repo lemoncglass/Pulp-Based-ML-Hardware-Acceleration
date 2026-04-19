@@ -192,6 +192,27 @@ section_hwpe_patches() {
   bash "$PATCH_DIR/patch_permanent.sh" || return 1
 }
 
+section_xlemon_target() {
+  # The XIF-based xlemon_adder HWPE needs custom .so files
+  # (ISS core with xlemon ISA, XifDecoder, XLemonAdder, ExitModule).
+  # build_xlemon_target.sh discovers the correct .so names via
+  # 'gvsoc ... components' and only compiles what's missing.
+  BUILD_SCRIPT="$SCRIPT_DIR/hwpe/xlemon_adder/build_xlemon_target.sh"
+  if [ ! -f "$BUILD_SCRIPT" ]; then
+    echo ">>> build_xlemon_target.sh not found — skipping."
+    return 0
+  fi
+
+  # Need GVSoC environment for gvsoc command
+  if [ -f "$SCRIPT_DIR/gvsoc/sourceme.sh" ]; then
+    source "$SCRIPT_DIR/gvsoc/sourceme.sh"
+  fi
+  export PATH="$HOME/riscv/bin:$PATH"
+
+  echo ">>> Building XIF xlemon_adder GVSoC components..."
+  bash "$BUILD_SCRIPT" || return 1
+}
+
 section_ml_libs() {
   echo ">>> Cloning ML libraries..."
   if [ ! -d pulp-nn ]; then
@@ -255,8 +276,9 @@ run_section "2. RISC-V Toolchain"       section_toolchain
 run_section "3. PULP SDK"               section_pulp_sdk
 run_section "4. GVSoC Simulator"        section_gvsoc
 run_section "5. HWPE GVSoC Patches"    section_hwpe_patches
-run_section "6. ML Libraries"           section_ml_libs
-run_section "7. RedMulE & Golden Model" section_redmule
+run_section "6. XIF XLemon Target"      section_xlemon_target
+run_section "7. ML Libraries"           section_ml_libs
+run_section "8. RedMulE & Golden Model" section_redmule
 
 # ─── Done ────────────────────────────────────────────────────────────────────
 echo ""
@@ -264,4 +286,5 @@ echo "============================================="
 echo "  Setup complete!"
 echo "  Run:  source setup_env.sh"
 echo "  Test: cd pulp-sdk/tests/hello && make clean all run"
+echo "  XIF:  cd hwpe/xlemon_adder && make sim"
 echo "============================================="

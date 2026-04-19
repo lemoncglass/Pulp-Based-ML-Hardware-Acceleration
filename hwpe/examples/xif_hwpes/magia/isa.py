@@ -11,27 +11,27 @@ Three instruction subsets are defined:
 
 1. Rv32redmule — RedMulE matrix multiply instructions
    ┌──────────┬──────────────────────────────────────────────┐
-   │ mcnfig   │ 0000000 rs2   rs1   000 rd    0001011       │
+   │ mcnfig   │ 0000000 rs2   rs1   000 rd    0001011        │
    │          │ Sets M,N,K dimensions.                       │
    │          │ rs1 = {K_SIZE[31:16], M_SIZE[15:0]}          │
    │          │ rs2 = N_SIZE                                 │
    ├──────────┼──────────────────────────────────────────────┤
-   │ marith   │ rs3 00 rs2   rs1   fmt imm   0101011        │
+   │ marith   │ rs3 00 rs2   rs1   fmt imm   0101011         │
    │          │ Sets addresses + format, triggers compute.   │
-   │          │ rs1 = X_addr, rs2 = W_addr, rs3 = Y_addr    │
-   │          │ imm[7:0] = {op_sel[5:3], format[2:0]}       │
+   │          │ rs1 = X_addr, rs2 = W_addr, rs3 = Y_addr     │
+   │          │ imm[7:0] = {op_sel[5:3], format[2:0]}        │
    └──────────┴──────────────────────────────────────────────┘
 
 2. iDMA_Ctrl — DMA engine control instructions
    ┌──────────┬──────────────────────────────────────────────┐
    │ dmcnf    │ Configure DMA                    (1011011)   │
-   │ dm1d2d3d │ 1D/2D/3D transfer               (1111011)   │
+   │ dm1d2d3d │ 1D/2D/3D transfer               (1111011)    │
    │ dmstr    │ Stride configuration             (1111011)   │
    └──────────┴──────────────────────────────────────────────┘
 
 3. FSync — FractalSync barrier instruction
    ┌──────────┬──────────────────────────────────────────────┐
-   │ fsync    │ 0000000 rs2   rs1   010 rd    1011011       │
+   │ fsync    │ 0000000 rs2   rs1   010 rd    1011011        │
    │          │ Barrier synchronization across tiles.        │
    │          │ rs1 = aggregation, rs2 = direction           │
    └──────────┴──────────────────────────────────────────────┘

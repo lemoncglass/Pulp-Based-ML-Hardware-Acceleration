@@ -27,6 +27,12 @@ Run one of the install scripts in
 See the [README inside that folder](gvsoc-patches/) for
 details on what gets patched and why.
 
+> **Note:** The MMIO approach above applies to `lemon_adder` and similar designs
+> that use memory-mapped registers on the CV32E40P core. For the **XIF approach**
+> (custom RISC-V instructions on a CV32E40X core), see
+> [`xlemon_adder/README.md`](xlemon_adder/README.md) instead — it uses a completely
+> different wiring path and does not need these MMIO patches.
+
 To verify the setup works, build the lemon_adder example:
 
 ```bash

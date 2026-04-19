@@ -18,6 +18,7 @@
 set -euo pipefail
 
 # --- Configuration ---
+REPO_ROOT="$(git rev-parse --show-toplevel)"
 # Set these paths if not already set in your environment
 GVSOC_ROOT="$REPO_ROOT/gvsoc"
 MODELS_DIR="$GVSOC_ROOT/install/models"

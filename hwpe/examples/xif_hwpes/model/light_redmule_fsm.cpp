@@ -9,10 +9,10 @@
  * State transitions:
  *
  *   IDLE ──(trigger)──► PRELOAD ──► ROUTINE ──┐
- *                                              │ (loop over tile triples)
- *                                              ├──► ROUTINE
- *                                              │
- *                          ┌───────────────────┘ (last iteration done)
+ *                                             │ (loop over tile triples)
+ *                                             ├──► ROUTINE
+ *                                             │
+ *                          ┌──────────────────┘ (last iteration done)
  *                          ▼
  *                       STORING ──► FINISHED ──► ACKNOWLEDGE ──► IDLE
  *                                       │

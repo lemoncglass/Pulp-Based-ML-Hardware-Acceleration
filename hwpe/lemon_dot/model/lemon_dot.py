@@ -1,7 +1,7 @@
 # Lemon Dot HWPE — GVSoC Python wrapper
 #
 # SPDX-License-Identifier: Apache-2.0
-# Copyright (c) 2026 Cody Glassbrenner
+# Copyright (c) 2026 University of Missouri - Kansas City
 #
 # Author: Cody Glassbrenner <glassbrennercody@gmail.com> (heavily assisted by Claude Opus 4.6 agent)
 #

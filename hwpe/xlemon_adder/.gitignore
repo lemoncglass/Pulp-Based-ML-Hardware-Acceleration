@@ -1,0 +1,18 @@
+# Build artifacts
+BUILD/
+work/
+*.elf
+*.dis
+*.debugInfo
+
+# GVSoC runtime outputs
+gvsoc_config.json
+power_report.csv
+trace_file.txt
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Old build script (superseded by build_xlemon_target.sh)
+build_iss.sh
